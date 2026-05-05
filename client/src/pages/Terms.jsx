@@ -1,3 +1,5 @@
+import usePageTitle from '../hooks/usePageTitle';
+
 const Section = ({ title, children }) => (
   <div className="mb-8">
     <h2 className="text-lg font-bold text-slate-900 mb-3">{title}</h2>
