@@ -7,9 +7,10 @@ const VoiceInput = ({ value, onChange }) => {
   const [pulseSize, setPulseSize] = useState(1);
   const recognitionRef = useRef(null);
   const animFrameRef = useRef(null);
-  // Keep a ref to always have latest value inside recognition callbacks
-  const valueRef = useRef(value);
-  useEffect(() => { valueRef.current = value; }, [value]);
+  // Snapshot of value at the moment mic is started — never changes mid-session
+  const baseValueRef = useRef('');
+  // Accumulates only the finals from THIS session — resets each time mic starts
+  const sessionFinalRef = useRef('');
 
   useEffect(() => {
     if (!('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)) {
@@ -29,6 +30,11 @@ const VoiceInput = ({ value, onChange }) => {
   };
 
   const startListening = () => {
+    // Snapshot the current value before session starts
+    baseValueRef.current = value;
+    // Reset session finals so we start fresh
+    sessionFinalRef.current = '';
+
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     const recognition = new SpeechRecognition();
     recognitionRef.current = recognition;
@@ -43,21 +49,23 @@ const VoiceInput = ({ value, onChange }) => {
     };
 
     recognition.onresult = (event) => {
-      let finalTranscript = '';
+      let newFinals = '';
       let interimTranscript = '';
+
       for (let i = event.resultIndex; i < event.results.length; i++) {
-        // ✅ Use [0] to access the best alternative for each result
         const t = event.results[i][0].transcript;
-        if (event.results[i].isFinal) finalTranscript += t;
+        if (event.results[i].isFinal) newFinals += t;
         else interimTranscript += t;
       }
-      if (finalTranscript) {
-        // ✅ Use valueRef to get latest value without stale closure,
-        //    then pass a plain string (not a function) to onChange.
-        //    This works whether the parent passes setState directly or a custom handler.
-        const updated = (valueRef.current + ' ' + finalTranscript).trim();
-        onChange(updated);
+
+      if (newFinals) {
+        // Append only the NEW finals from this event to the session accumulator
+        sessionFinalRef.current = (sessionFinalRef.current + ' ' + newFinals).trim();
+        // Rebuild full value: what was there before mic + what we've heard this session
+        const combined = (baseValueRef.current + ' ' + sessionFinalRef.current).trim();
+        onChange(combined);
       }
+
       setInterim(interimTranscript);
     };
 
