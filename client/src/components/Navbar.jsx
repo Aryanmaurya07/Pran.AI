@@ -1,29 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-
-const HINDI_FONT = { fontFamily: "'Tiro Devanagari Hindi', serif", fontWeight: 700 };
-
-const Logo = () => (
-  <Link to="/" className="flex items-center gap-2.5 group">
-    <div className="w-9 h-9 rounded-xl bg-teal-600 flex items-center justify-center shadow-sm flex-shrink-0 group-hover:bg-teal-700 transition-colors duration-200">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-        <path
-          d="M3 12h3l2-7 4 14 3-10 2 3h4"
-          stroke="white"
-          strokeWidth="2.2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    </div>
-    <span className="text-xl tracking-tight leading-none select-none flex items-baseline gap-0">
-      <span style={HINDI_FONT} className="text-slate-900 text-[22px]">प्राण</span>
-      <span className="font-bold text-slate-400 text-lg">.</span>
-      <span className="font-bold text-teal-600 text-xl">AI</span>
-    </span>
-  </Link>
-);
+import Logo from './Logo';
 
 const NavLink = ({ to, children, onClick }) => {
   const location = useLocation();
@@ -43,7 +21,6 @@ const NavLink = ({ to, children, onClick }) => {
   );
 };
 
-// Reusable chevron icon
 const ChevronIcon = ({ open }) => (
   <svg
     width="14"
@@ -65,14 +42,11 @@ const Navbar = () => {
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-
-  //  FIX: Separate state & refs for each dropdown
   const [moreOpen, setMoreOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const moreRef = useRef(null);
   const profileRef = useRef(null);
 
-  // Close mobile menu on route change
   useEffect(() => {
     setMenuOpen(false);
     setMoreOpen(false);
@@ -85,7 +59,6 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  //  FIX: Separate outside-click handlers for each dropdown
   useEffect(() => {
     const handler = (e) => {
       if (moreRef.current && !moreRef.current.contains(e.target)) {
@@ -134,7 +107,6 @@ const Navbar = () => {
             <NavLink to="/about">About</NavLink>
             <NavLink to="/contact">Contact</NavLink>
 
-            {/*  "More" dropdown — uses moreRef & moreOpen only */}
             <div className="relative" ref={moreRef}>
               <button
                 onClick={() => setMoreOpen((prev) => !prev)}
@@ -175,7 +147,6 @@ const Navbar = () => {
                   Dashboard
                 </Link>
 
-                {/*  Profile dropdown — uses profileRef & profileOpen only */}
                 <div className="relative" ref={profileRef}>
                   <button
                     onClick={() => setProfileOpen((prev) => !prev)}
@@ -192,7 +163,6 @@ const Navbar = () => {
 
                   {profileOpen && (
                     <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-slate-200/80 py-1.5 overflow-hidden z-50 animate-in fade-in slide-in-from-top-1 duration-150">
-                      {/* User info header */}
                       <div className="px-4 py-2.5 border-b border-slate-100 mb-1">
                         <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
                           Signed in as
@@ -302,7 +272,6 @@ const Navbar = () => {
           <div className="border-t border-slate-100 mt-2 pt-2 flex flex-col gap-2">
             {isAuthenticated ? (
               <>
-                {/* Mobile user info */}
                 <div className="flex items-center gap-2.5 px-3 py-2">
                   <div className="w-8 h-8 rounded-full bg-gradient-to-br from-teal-500 to-teal-700 flex items-center justify-center text-sm font-bold text-white">
                     {userInitial}

@@ -7,6 +7,9 @@ const VoiceInput = ({ value, onChange }) => {
   const [pulseSize, setPulseSize] = useState(1);
   const recognitionRef = useRef(null);
   const animFrameRef = useRef(null);
+  // Keep a ref to always have latest value inside recognition callbacks
+  const valueRef = useRef(value);
+  useEffect(() => { valueRef.current = value; }, [value]);
 
   useEffect(() => {
     if (!('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)) {
@@ -43,11 +46,18 @@ const VoiceInput = ({ value, onChange }) => {
       let finalTranscript = '';
       let interimTranscript = '';
       for (let i = event.resultIndex; i < event.results.length; i++) {
-        const t = event.results[i].transcript;
+        // ✅ Use [0] to access the best alternative for each result
+        const t = event.results[i][0].transcript;
         if (event.results[i].isFinal) finalTranscript += t;
         else interimTranscript += t;
       }
-      if (finalTranscript) onChange(prev => (prev + ' ' + finalTranscript).trim());
+      if (finalTranscript) {
+        // ✅ Use valueRef to get latest value without stale closure,
+        //    then pass a plain string (not a function) to onChange.
+        //    This works whether the parent passes setState directly or a custom handler.
+        const updated = (valueRef.current + ' ' + finalTranscript).trim();
+        onChange(updated);
+      }
       setInterim(interimTranscript);
     };
 

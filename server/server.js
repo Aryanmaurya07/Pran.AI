@@ -37,3 +37,5 @@ mongoose.connect(process.env.MONGO_URI)
     });
   })
   .catch(err => console.error('MongoDB error:', err));
+
+  app.get('/api/health', (req, res) => res.json({ status: 'ok' }));

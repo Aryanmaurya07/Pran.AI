@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -21,6 +22,15 @@ const NO_FOOTER_PATHS = ['/dashboard', '/symptoms', '/results', '/nearby-doctors
 const AppLayout = () => {
   const location = useLocation();
   const showFooter = !NO_FOOTER_PATHS.includes(location.pathname);
+
+  // Ping the backend on app load so Render wakes up from sleep.
+  // This runs once when the app first mounts, so by the time the user
+  // reaches login/register the server is already warm.
+  useEffect(() => {
+    fetch(`${import.meta.env.VITE_API_URL}/api/health`, { method: 'GET' })
+      .catch(() => {}); // silent — we only care about waking it up
+  }, []);
+
   return (
     <>
       <Navbar />
