@@ -19,6 +19,17 @@ const symptomHistorySchema = new mongoose.Schema({
     type: String,
     default: ''
   },
+  // ── Patient info fields (new) ──────────────────────────────
+  patientAge: { type: Number, default: null },
+  patientGender: {
+    type: String,
+    enum: ['Male', 'Female', 'Other', ''],
+    default: ''
+  },
+  symptomDuration: { type: String, default: '' },  // e.g. "2 days"
+  painLevel: { type: Number, default: null },       // 1–10
+  existingConditions: { type: String, default: '' },
+  // ── AI result fields ──────────────────────────────────────
   condition: { type: String, default: '' },
   severity: {
     type: String,
@@ -28,6 +39,11 @@ const symptomHistorySchema = new mongoose.Schema({
   remedies: { type: String, default: '' },
   doctorType: { type: String, default: '' },
   description: { type: String, default: '' },
+  urgency: { type: String, default: '' },
+  // ── Reliability score (new) ───────────────────────────────
+  reliabilityScore: { type: Number, default: null }, // 0–100
+  reliabilityNote: { type: String, default: '' },
+  // ── Raw ──────────────────────────────────────────────────
   fullAiResponse: { type: String, default: '' }
 }, { timestamps: true });
 

@@ -7,6 +7,7 @@ import { fileURLToPath } from 'url';
 import authRoutes from './routes/auth.js';
 import symptomRoutes from './routes/symptoms.js';
 import doctorRoutes from './routes/doctors.js';
+import adminRoutes from './routes/admin.js';
 
 dotenv.config();
 
@@ -23,12 +24,16 @@ app.use(express.json({ limit: '20mb' }));
 app.use(express.urlencoded({ extended: true, limit: '20mb' }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-app.use('/api/auth', authRoutes);
+// ── Routes ────────────────────────────────────────────────────────────────────
+app.get('/api/health', (req, res) => res.json({ status: 'ok' })); // ← moved up
+app.use('/api/auth',     authRoutes);
 app.use('/api/symptoms', symptomRoutes);
-app.use('/api/doctors', doctorRoutes);
+app.use('/api/doctors',  doctorRoutes);
+app.use('/api/admin',    adminRoutes);
 
-app.get('/', (req, res) => res.json({ message: 'PranixAI server running' }));
+app.get('/', (req, res) => res.json({ message: 'प्राण.AI server running' }));
 
+// ── DB + Server ───────────────────────────────────────────────────────────────
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log('MongoDB connected');
@@ -37,5 +42,3 @@ mongoose.connect(process.env.MONGO_URI)
     });
   })
   .catch(err => console.error('MongoDB error:', err));
-
-  app.get('/api/health', (req, res) => res.json({ status: 'ok' }));

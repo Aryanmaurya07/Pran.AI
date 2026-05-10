@@ -6,35 +6,16 @@ import usePageTitle from '../hooks/usePageTitle';
 
 const tabs = [
   {
-    id: 'text',
-    label: 'Type',
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-        <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" strokeLinecap="round"/>
-        <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" strokeLinecap="round"/>
-      </svg>
-    )
+    id: 'text', label: 'Type',
+    icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" strokeLinecap="round"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" strokeLinecap="round"/></svg>
   },
   {
-    id: 'voice',
-    label: 'Speak',
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-        <path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z" strokeLinecap="round"/>
-        <path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8" strokeLinecap="round"/>
-      </svg>
-    )
+    id: 'voice', label: 'Speak',
+    icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z" strokeLinecap="round"/><path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8" strokeLinecap="round"/></svg>
   },
   {
-    id: 'image',
-    label: 'Upload',
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-        <rect x="3" y="3" width="18" height="18" rx="3"/>
-        <circle cx="8.5" cy="8.5" r="1.5"/>
-        <path d="M21 15l-5-5L5 21" strokeLinecap="round" strokeLinejoin="round"/>
-      </svg>
-    )
+    id: 'image', label: 'Upload',
+    icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21" strokeLinecap="round" strokeLinejoin="round"/></svg>
   }
 ];
 
@@ -46,7 +27,9 @@ const examples = [
   'Stomach pain after eating, bloating and nausea',
 ];
 
-// Shown when image tab is selected — feature temporarily disabled
+const DURATIONS = ['Less than 24 hours', '1–3 days', '4–7 days', '1–2 weeks', 'More than 2 weeks'];
+const GENDERS   = ['Male', 'Female', 'Other'];
+
 const ImageComingSoon = () => (
   <div className="flex flex-col items-center justify-center py-14 px-6 text-center">
     <div className="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center mb-5">
@@ -60,16 +43,112 @@ const ImageComingSoon = () => (
     <p className="text-slate-400 text-sm max-w-xs leading-relaxed">
       This feature is temporarily unavailable. Please use{' '}
       <strong className="text-slate-600">Type</strong> or{' '}
-      <strong className="text-slate-600">Speak</strong> to describe your symptoms instead.
+      <strong className="text-slate-600">Speak</strong> to describe your symptoms.
     </p>
-    <div className="mt-6 bg-blue-50 border border-blue-100 rounded-xl px-5 py-3 max-w-xs">
+    <div className="mt-5 bg-blue-50 border border-blue-100 rounded-xl px-5 py-3 max-w-xs">
       <p className="text-xs text-blue-600 leading-relaxed">
-        We're working on adding image analysis. It will support rashes, skin conditions, eye redness, wounds, and swelling.
+        We're working on adding image analysis — rashes, skin conditions, eye redness, and more.
       </p>
     </div>
   </div>
 );
 
+// ── Patient Info Form ──────────────────────────────────────────────────────────
+const PatientInfoForm = ({ info, onChange }) => (
+  <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 mb-6">
+    <div className="flex items-center gap-2 mb-4">
+      <div className="w-7 h-7 rounded-lg bg-teal-100 flex items-center justify-center">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0d9488" strokeWidth="2.5">
+          <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>
+        </svg>
+      </div>
+      <p className="text-sm font-bold text-slate-800">Patient Info <span className="text-slate-400 font-normal">(optional — improves accuracy)</span></p>
+    </div>
+
+    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+      {/* Age */}
+      <div>
+        <label className="block text-xs font-semibold text-slate-500 mb-1.5">Age</label>
+        <input
+          type="number"
+          min="1" max="120"
+          placeholder="e.g. 25"
+          value={info.age}
+          onChange={e => onChange({ ...info, age: e.target.value })}
+          className="w-full bg-white border border-slate-200 text-slate-900 placeholder-slate-400 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500/20 transition-colors"
+        />
+      </div>
+
+      {/* Gender */}
+      <div>
+        <label className="block text-xs font-semibold text-slate-500 mb-1.5">Gender</label>
+        <select
+          value={info.gender}
+          onChange={e => onChange({ ...info, gender: e.target.value })}
+          className="w-full bg-white border border-slate-200 text-slate-900 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500/20 transition-colors appearance-none cursor-pointer"
+        >
+          <option value="">Select</option>
+          {GENDERS.map(g => <option key={g} value={g}>{g}</option>)}
+        </select>
+      </div>
+
+      {/* Duration */}
+      <div className="col-span-2 sm:col-span-1">
+        <label className="block text-xs font-semibold text-slate-500 mb-1.5">Duration</label>
+        <select
+          value={info.duration}
+          onChange={e => onChange({ ...info, duration: e.target.value })}
+          className="w-full bg-white border border-slate-200 text-slate-900 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500/20 transition-colors appearance-none cursor-pointer"
+        >
+          <option value="">How long?</option>
+          {DURATIONS.map(d => <option key={d} value={d}>{d}</option>)}
+        </select>
+      </div>
+    </div>
+
+    {/* Pain level slider */}
+    <div className="mt-4">
+      <label className="block text-xs font-semibold text-slate-500 mb-2">
+        Pain / Discomfort Level —{' '}
+        <span className={`font-bold ${
+          !info.painLevel ? 'text-slate-400'
+          : info.painLevel <= 3 ? 'text-green-600'
+          : info.painLevel <= 6 ? 'text-amber-600'
+          : 'text-red-600'
+        }`}>
+          {info.painLevel ? `${info.painLevel}/10` : 'Not set'}
+        </span>
+      </label>
+      <input
+        type="range" min="1" max="10" step="1"
+        value={info.painLevel || 1}
+        onChange={e => onChange({ ...info, painLevel: Number(e.target.value) })}
+        className="w-full accent-teal-600 cursor-pointer"
+      />
+      <div className="flex justify-between text-xs text-slate-400 mt-1">
+        <span>1 — Mild</span>
+        <span>5 — Moderate</span>
+        <span>10 — Severe</span>
+      </div>
+    </div>
+
+    {/* Existing conditions */}
+    <div className="mt-4">
+      <label className="block text-xs font-semibold text-slate-500 mb-1.5">
+        Existing conditions / medications <span className="text-slate-400 font-normal">(optional)</span>
+      </label>
+      <input
+        type="text"
+        placeholder="e.g. Diabetes, BP medication, Allergic to penicillin"
+        value={info.existingConditions}
+        onChange={e => onChange({ ...info, existingConditions: e.target.value })}
+        className="w-full bg-white border border-slate-200 text-slate-900 placeholder-slate-400 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500/20 transition-colors"
+      />
+    </div>
+  </div>
+);
+
+// ── Main component ─────────────────────────────────────────────────────────────
 const SymptomInput = () => {
   usePageTitle('Check Symptoms');
 
@@ -77,12 +156,14 @@ const SymptomInput = () => {
   const [textInput, setTextInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [patientInfo, setPatientInfo] = useState({
+    age: '', gender: '', duration: '', painLevel: null, existingConditions: ''
+  });
   const navigate = useNavigate();
 
   const handleSubmit = async () => {
     setError('');
 
-    // Block submit if image tab is active (feature disabled)
     if (activeTab === 'image') {
       setError('Image upload is temporarily unavailable. Please use Type or Speak instead.');
       return;
@@ -98,6 +179,12 @@ const SymptomInput = () => {
       const payload = {
         inputType: activeTab === 'voice' ? 'voice' : 'text',
         text: textInput,
+        // Patient info
+        patientAge: patientInfo.age ? Number(patientInfo.age) : null,
+        patientGender: patientInfo.gender || '',
+        symptomDuration: patientInfo.duration || '',
+        painLevel: patientInfo.painLevel || null,
+        existingConditions: patientInfo.existingConditions || ''
       };
 
       const { data } = await api.post('/api/symptoms/analyze', payload);
@@ -118,15 +205,16 @@ const SymptomInput = () => {
         <div className="text-center mb-10">
           <div className="inline-flex items-center gap-2 bg-teal-50 border border-teal-200 text-teal-700 text-xs font-semibold px-3 py-1 rounded-full mb-4">
             <span className="w-1.5 h-1.5 rounded-full bg-teal-500 animate-pulse" />
-            Powered by Google Gemini AI
+            Powered by Groq AI
           </div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3">
-            What's going on?
-          </h1>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3">What's going on?</h1>
           <p className="text-slate-500 text-lg max-w-lg mx-auto">
             Describe how you feel. प्राण.AI will analyse your symptoms and tell you what to do next.
           </p>
         </div>
+
+        {/* Patient info form — always visible */}
+        <PatientInfoForm info={patientInfo} onChange={setPatientInfo} />
 
         {/* Main card */}
         <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
@@ -142,21 +230,16 @@ const SymptomInput = () => {
                     ? 'text-teal-600 border-b-2 border-teal-600 bg-teal-50/50'
                     : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50 border-b-2 border-transparent'
                 }`}>
-                {tab.icon}
-                {tab.label}
+                {tab.icon}{tab.label}
               </button>
             ))}
           </div>
 
-          {/* Tab content */}
           <div className="p-6 sm:p-8">
-
             {/* TEXT TAB */}
             {activeTab === 'text' && (
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-3">
-                  Describe your symptoms
-                </label>
+                <label className="block text-sm font-semibold text-slate-700 mb-3">Describe your symptoms</label>
                 <textarea
                   value={textInput}
                   onChange={e => { setTextInput(e.target.value); setError(''); }}
@@ -170,8 +253,6 @@ const SymptomInput = () => {
                     {textInput.length}/500
                   </span>
                 </div>
-
-                {/* Quick examples */}
                 <div>
                   <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Try an example</p>
                   <div className="flex flex-wrap gap-2">
@@ -188,15 +269,11 @@ const SymptomInput = () => {
 
             {/* VOICE TAB */}
             {activeTab === 'voice' && (
-              // ✅ Passes setTextInput directly — VoiceInput now calls onChange(string)
-              // so this works correctly without any wrapper
               <VoiceInput value={textInput} onChange={setTextInput} />
             )}
 
-            {/* IMAGE TAB — Coming soon UI instead of blank screen */}
-            {activeTab === 'image' && (
-              <ImageComingSoon />
-            )}
+            {/* IMAGE TAB */}
+            {activeTab === 'image' && <ImageComingSoon />}
 
             {/* Error */}
             {error && (
@@ -208,7 +285,7 @@ const SymptomInput = () => {
               </div>
             )}
 
-            {/* Submit — hidden on image tab since feature is disabled */}
+            {/* Submit */}
             {activeTab !== 'image' && (
               <button
                 onClick={handleSubmit}
@@ -232,7 +309,6 @@ const SymptomInput = () => {
           </div>
         </div>
 
-        {/* Disclaimer */}
         <p className="text-center text-slate-400 text-xs mt-6 leading-relaxed max-w-md mx-auto">
           प्राण.AI provides preliminary health information only — not a medical diagnosis.
           Always consult a qualified healthcare professional for medical advice.
